@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { getConsultationResponse } from '../services/geminiService';
 import { ChatMessage, FileAttachment } from '../types';
-import { Send, User, Bot, Loader2, AlertTriangle, Paperclip, FileText, X, Copy, Download, File as FileIcon, Image as ImageIcon, Sparkles, CheckCircle2, Calculator, HelpCircle, Trash2 } from 'lucide-react';
+import { Send, User, Bot, Loader2, AlertTriangle, Paperclip, FileText, X, Copy, Download, File as FileIcon, Image as ImageIcon, Sparkles, CheckCircle2, Calculator, HelpCircle, Trash2, MoreHorizontal } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -31,7 +31,6 @@ const AIConsultant: React.FC = () => {
     const savedHistory = localStorage.getItem('statmate_chat_history');
     if (savedHistory) {
       try {
-        // Need to revive dates from JSON
         const parsed = JSON.parse(savedHistory, (key, value) => {
             if (key === 'timestamp') return new Date(value);
             return value;
@@ -41,7 +40,6 @@ const AIConsultant: React.FC = () => {
         console.error("Failed to load history", e);
       }
     } else {
-      // Set initial welcome message if no history
        setMessages([{
         role: 'model',
         text: t('ai_welcome'),
@@ -50,7 +48,6 @@ const AIConsultant: React.FC = () => {
     }
   }, []);
 
-  // Save history to LocalStorage whenever messages change
   useEffect(() => {
     if (messages.length > 0) {
       localStorage.setItem('statmate_chat_history', JSON.stringify(messages));
@@ -58,7 +55,7 @@ const AIConsultant: React.FC = () => {
   }, [messages]);
 
   const clearHistory = () => {
-    if (window.confirm('Are you sure you want to clear the chat history?')) {
+    if (window.confirm('Clear conversation history?')) {
       const initialMsg: ChatMessage = {
          role: 'model',
          text: t('ai_welcome'),
@@ -122,7 +119,6 @@ const AIConsultant: React.FC = () => {
         parts: [{ text: m.text }]
       }));
 
-      // Pass current language setting to API
       const responseText = await getConsultationResponse(userMsg.text, userMsg.attachments, history, language);
       
       const botMsg: ChatMessage = {
@@ -145,7 +141,7 @@ const AIConsultant: React.FC = () => {
 
   const handleCopyMarkdown = (text: string) => {
       navigator.clipboard.writeText(text);
-      alert("Markdown copied!");
+      // Optional: Toast notification
   };
 
   const handleExportPDF = (elementId: string) => {
@@ -153,82 +149,93 @@ const AIConsultant: React.FC = () => {
       if(element && typeof html2pdf !== 'undefined') {
           const opt = {
             margin: 0.5,
-            filename: 'statmate_analysis.pdf',
+            filename: 'statmate_report.pdf',
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2, useCORS: true },
             jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
           };
           html2pdf().set(opt).from(element).save();
-      } else {
-          alert("PDF library loading... please wait.");
       }
   };
 
   return (
-    <div className="max-w-5xl mx-auto h-[calc(100vh-140px)] flex flex-col">
-      <div className="bg-primary-900 text-white p-4 rounded-t-xl shadow-md flex items-center justify-between">
+    <div className="max-w-6xl mx-auto h-[calc(100vh-140px)] flex flex-col bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+      {/* Header - Enterprise Style */}
+      <div className="bg-white border-b border-slate-200 p-4 flex items-center justify-between shadow-sm z-10">
         <div className="flex items-center gap-3">
-          <div className="bg-white/10 p-2 rounded-lg">
-            <Bot size={24} />
+          <div className="bg-primary-50 p-2 rounded-md border border-primary-100">
+            <Bot size={20} className="text-primary-600" />
           </div>
           <div>
-            <h2 className="font-bold">Jamovi Research Consultant</h2>
-            <p className="text-primary-200 text-xs">Powered by Gemini 2.5 • {language.toUpperCase()}</p>
+            <h2 className="font-semibold text-slate-800 text-sm leading-tight">Jamovi Consultant</h2>
+            <p className="text-slate-500 text-[11px] font-medium flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> Online • Gemini 2.5
+            </p>
           </div>
         </div>
         <button 
             onClick={clearHistory} 
-            className="flex items-center gap-1 text-xs bg-primary-800 hover:bg-red-600 text-white px-3 py-1.5 rounded transition-colors"
+            className="text-slate-400 hover:text-red-500 transition-colors p-2 hover:bg-slate-50 rounded-md"
+            title="Clear History"
         >
-            <Trash2 size={14} /> {t('ai_clear_history')}
+            <Trash2 size={18} />
         </button>
       </div>
 
       {/* Chat Area */}
-      <div className="flex-grow bg-white border-x border-slate-200 overflow-y-auto p-6 space-y-8">
+      <div className="flex-grow bg-slate-50/50 overflow-y-auto p-4 md:p-6 space-y-6">
         {messages.map((msg, index) => (
           <div
             key={index}
-            className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
+            className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-              msg.role === 'user' ? 'bg-slate-200 text-slate-600' : 'bg-primary-100 text-primary-600'
-            }`}>
-              {msg.role === 'user' ? <User size={20} /> : <Bot size={20} />}
-            </div>
+            {/* Avatar for Bot */}
+            {msg.role === 'model' && (
+                <div className="w-8 h-8 rounded-md bg-white border border-slate-200 flex items-center justify-center flex-shrink-0 shadow-sm">
+                   <Bot size={16} className="text-primary-600" />
+                </div>
+            )}
             
-            <div className={`max-w-[85%] flex flex-col gap-2 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+            <div className={`max-w-[85%] lg:max-w-[75%] flex flex-col gap-1 ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
                 
-                {/* Attachments Display */}
+                {/* User Name / Time */}
+                <div className="flex items-center gap-2 px-1">
+                     <span className="text-[11px] font-semibold text-slate-500">
+                        {msg.role === 'user' ? 'You' : 'StatMate AI'}
+                     </span>
+                     <span className="text-[10px] text-slate-400">
+                        {msg.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                     </span>
+                </div>
+
+                {/* Attachments */}
                 {msg.attachments && msg.attachments.length > 0 && (
                     <div className="flex gap-2 mb-1 flex-wrap justify-end">
                         {msg.attachments.map((att, i) => (
-                            <div key={i} className="bg-slate-100 border border-slate-200 text-slate-600 text-xs px-3 py-2 rounded-lg flex items-center gap-2">
-                                {att.mimeType.includes('image') ? <ImageIcon size={14}/> : <FileIcon size={14}/>}
-                                <span className="max-w-[150px] truncate">{att.name}</span>
+                            <div key={i} className="bg-white border border-slate-200 text-slate-600 text-xs px-3 py-2 rounded-md shadow-sm flex items-center gap-2">
+                                {att.mimeType.includes('image') ? <ImageIcon size={14} className="text-purple-500"/> : <FileIcon size={14} className="text-blue-500"/>}
+                                <span className="max-w-[150px] truncate font-medium">{att.name}</span>
                             </div>
                         ))}
                     </div>
                 )}
 
+                {/* Message Bubble */}
                 <div 
                   id={`msg-${index}`}
-                  className={`rounded-2xl p-5 shadow-sm w-full ${
+                  className={`rounded-lg p-4 shadow-sm border text-sm leading-relaxed w-full ${
                   msg.role === 'user' 
-                    ? 'bg-primary-600 text-white rounded-tr-none' 
-                    : 'bg-white border border-slate-200 rounded-tl-none'
+                    ? 'bg-primary-600 text-white border-primary-600' 
+                    : 'bg-white border-slate-200 text-slate-800'
                 }`}>
-                  <div className={`prose ${msg.role === 'user' ? 'prose-invert' : 'prose-slate'} max-w-none text-sm leading-relaxed markdown-table`}>
+                  <div className={`prose ${msg.role === 'user' ? 'prose-invert' : 'prose-slate'} max-w-none prose-p:my-1 prose-headings:my-2 prose-li:my-0.5 markdown-table`}>
                     <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
                         components={{
-                            h1: ({node, ...props}) => <h1 className="text-2xl font-bold mb-4 border-b pb-2" {...props} />,
-                            h2: ({node, ...props}) => <h2 className="text-xl font-semibold mb-3 mt-6 text-primary-700" {...props} />,
-                            h3: ({node, ...props}) => <h3 className="text-lg font-medium mb-2 mt-4 text-primary-600" {...props} />,
-                            table: ({node, ...props}) => <div className="overflow-x-auto"><table className="min-w-full divide-y divide-slate-200 my-4" {...props} /></div>,
-                            th: ({node, ...props}) => <th className="bg-slate-50 px-3 py-2 text-left text-xs font-medium text-slate-500 uppercase tracking-wider border border-slate-200" {...props} />,
-                            td: ({node, ...props}) => <td className="px-3 py-2 whitespace-normal text-sm text-slate-600 border border-slate-200" {...props} />,
-                            strong: ({node, ...props}) => <strong className="font-bold text-primary-900 bg-primary-50 px-1 rounded" {...props} />
+                            table: ({node, ...props}) => <div className="overflow-x-auto"><table className="w-full my-2" {...props} /></div>,
+                            th: ({node, ...props}) => <th className="bg-slate-50/50 px-2 py-1.5 text-left text-xs font-semibold uppercase tracking-wider border-b border-slate-200" {...props} />,
+                            td: ({node, ...props}) => <td className="px-2 py-1.5 text-sm border-b border-slate-100" {...props} />,
+                            a: ({node, ...props}) => <a className="underline decoration-dotted underline-offset-2 hover:text-blue-200" {...props} />
                         }}
                     >
                         {msg.text}
@@ -236,48 +243,36 @@ const AIConsultant: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Bot Actions Toolbar */}
+                {/* Bot Actions */}
                 {msg.role === 'model' && (
-                    <div className="flex gap-2 mt-1">
-                        <button 
-                            onClick={() => handleCopyMarkdown(msg.text)}
-                            className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-primary-600 bg-slate-50 px-2 py-1 rounded border border-slate-200 transition-colors"
-                        >
-                            <Copy size={12} /> {t('ai_copy')}
+                    <div className="flex gap-2 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <button onClick={() => handleCopyMarkdown(msg.text)} className="text-[10px] text-slate-400 hover:text-primary-600 flex items-center gap-1">
+                            <Copy size={12} /> Copy
                         </button>
-                         <button 
-                            onClick={() => handleExportPDF(`msg-${index}`)}
-                            className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-red-600 bg-slate-50 px-2 py-1 rounded border border-slate-200 transition-colors"
-                        >
-                            <Download size={12} /> {t('ai_export')}
+                        <span className="text-slate-300">|</span>
+                        <button onClick={() => handleExportPDF(`msg-${index}`)} className="text-[10px] text-slate-400 hover:text-primary-600 flex items-center gap-1">
+                            <Download size={12} /> PDF
                         </button>
                     </div>
                 )}
-                
-                <span className={`text-[10px] ${msg.role === 'user' ? 'text-primary-200' : 'text-slate-400'}`}>
-                    {msg.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                </span>
             </div>
           </div>
         ))}
         
-        {/* Suggested Questions */}
+        {/* Suggested Questions (Empty State) */}
         {messages.length === 1 && !loading && (
-          <div className="px-4 mt-4 animate-fade-in">
-             <h3 className="text-xs font-bold text-slate-400 uppercase mb-3 flex items-center gap-1">
-                <Sparkles size={12} /> Suggested Questions
-             </h3>
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="px-4 mt-8">
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
                 {getSuggestions().map((s, i) => (
                   <button
                     key={i}
                     onClick={() => handleSuggestionClick(s.text)}
-                    className="flex items-center gap-3 p-3 text-sm text-left text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-primary-50 hover:border-primary-200 hover:shadow-sm transition-all group"
+                    className="flex items-center gap-3 p-4 text-sm text-left text-slate-600 bg-white border border-slate-200 rounded-lg hover:border-primary-300 hover:shadow-md transition-all group"
                   >
-                    <div className="bg-slate-50 group-hover:bg-white p-2 rounded-lg transition-colors border border-slate-100 group-hover:border-primary-100">
+                    <div className="bg-slate-50 group-hover:bg-primary-50 p-2 rounded-md transition-colors">
                         {s.icon}
                     </div>
-                    <span>{s.text}</span>
+                    <span className="font-medium">{s.text}</span>
                   </button>
                 ))}
              </div>
@@ -286,19 +281,19 @@ const AIConsultant: React.FC = () => {
 
         {loading && (
           <div className="flex gap-4">
-             <div className="w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center flex-shrink-0">
-               <Bot size={20} />
+             <div className="w-8 h-8 rounded-md bg-white border border-slate-200 flex items-center justify-center flex-shrink-0">
+               <Bot size={16} className="text-primary-600" />
              </div>
-             <div className="bg-slate-50 rounded-2xl rounded-tl-none p-4 border border-slate-100 flex items-center gap-2">
-                <Loader2 className="animate-spin text-primary-600" size={18} />
-                <span className="text-slate-500 text-sm">{t('ai_reading')}</span>
+             <div className="bg-white rounded-lg p-3 border border-slate-200 flex items-center gap-3 shadow-sm">
+                <Loader2 className="animate-spin text-primary-500" size={16} />
+                <span className="text-slate-500 text-xs font-medium">{t('ai_reading')}</span>
              </div>
           </div>
         )}
 
         {error && (
-            <div className="mx-auto max-w-md bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg flex items-center gap-3 text-sm">
-                <AlertTriangle size={20} />
+            <div className="mx-auto max-w-md bg-red-50 border border-red-200 text-red-700 p-3 rounded-md flex items-center gap-3 text-sm">
+                <AlertTriangle size={16} />
                 {error}
             </div>
         )}
@@ -307,32 +302,35 @@ const AIConsultant: React.FC = () => {
       </div>
 
       {/* Input Area */}
-      <div className="bg-white p-4 border border-slate-200 rounded-b-xl shadow-sm">
+      <div className="bg-white p-4 border-t border-slate-200">
          {/* Attachments Preview */}
          {attachments.length > 0 && (
-             <div className="flex gap-3 mb-3 overflow-x-auto py-2">
+             <div className="flex gap-2 mb-3 overflow-x-auto pb-1">
                  {attachments.map((att, i) => (
-                     <div key={i} className="relative bg-primary-50 border border-primary-100 rounded-lg p-2 flex items-center gap-2 min-w-[120px]">
-                         <div className="bg-white p-1 rounded text-primary-600">
-                             {att.mimeType.includes('image') ? <ImageIcon size={16}/> : <FileIcon size={16}/>}
+                     <div key={i} className="relative bg-slate-50 border border-slate-200 rounded-md p-2 flex items-center gap-2 min-w-[140px]">
+                         <div className="bg-white p-1 rounded border border-slate-100 text-primary-600">
+                             {att.mimeType.includes('image') ? <ImageIcon size={14}/> : <FileIcon size={14}/>}
                          </div>
-                         <span className="text-xs text-primary-900 truncate max-w-[100px]">{att.name}</span>
+                         <div className="flex flex-col overflow-hidden">
+                            <span className="text-xs font-medium text-slate-700 truncate max-w-[100px]">{att.name}</span>
+                            <span className="text-[10px] text-slate-400">Attached</span>
+                         </div>
                          <button 
                             onClick={() => removeAttachment(i)}
-                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-0.5 hover:bg-red-600"
+                            className="absolute -top-1.5 -right-1.5 bg-slate-200 text-slate-500 rounded-full p-0.5 hover:bg-red-500 hover:text-white transition-colors"
                          >
-                             <X size={12} />
+                             <X size={10} />
                          </button>
                      </div>
                  ))}
              </div>
          )}
 
-        <div className="flex gap-2 items-end">
+        <div className="flex gap-2 items-end max-w-4xl mx-auto">
           <button 
             onClick={() => fileInputRef.current?.click()}
-            className="p-3 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-colors border border-transparent hover:border-primary-100"
-            title="Upload PDF, CSV, or Image"
+            className="p-2.5 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors mb-0.5"
+            title="Attach File"
           >
             <Paperclip size={20} />
           </button>
@@ -344,29 +342,31 @@ const AIConsultant: React.FC = () => {
             accept=".pdf,.csv,.txt,.jpg,.jpeg,.png"
           />
 
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSendClick();
-                }
-            }}
-            placeholder={t('ai_placeholder')}
-            className="flex-grow px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all resize-none h-[52px] max-h-32"
-            disabled={loading}
-          />
+          <div className="flex-grow relative">
+            <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSendClick();
+                    }
+                }}
+                placeholder={t('ai_placeholder')}
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-1 focus:ring-primary-500 focus:border-primary-500 focus:bg-white outline-none transition-all resize-none text-sm text-slate-700 placeholder:text-slate-400 min-h-[46px] max-h-32"
+            />
+          </div>
+          
           <button
             onClick={handleSendClick}
             disabled={loading || (!input.trim() && attachments.length === 0)}
-            className="bg-primary-600 hover:bg-primary-700 disabled:bg-slate-300 text-white p-3 rounded-xl transition-colors h-[52px] w-[52px] flex items-center justify-center"
+            className="bg-primary-600 hover:bg-primary-700 disabled:bg-slate-200 disabled:text-slate-400 text-white p-2.5 rounded-lg transition-colors mb-0.5 shadow-sm"
           >
-            <Send size={20} />
+            <Send size={18} />
           </button>
         </div>
-        <p className="text-center text-xs text-slate-400 mt-2">
-          AI can analyze Charts, CSV data, and Research PDFs.
+        <p className="text-center text-[10px] text-slate-400 mt-2">
+          StatMate AI can make mistakes. Please verify critical statistical outputs.
         </p>
       </div>
     </div>
