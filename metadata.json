@@ -1,0 +1,5 @@
+{
+  "name": "StatMate: Jamovi Companion",
+  "description": "A professional statistical analysis dashboard and Jamovi consulting assistant. Features interactive descriptive statistics, t-test calculators, and an AI consultant specializing in research methodology and Jamovi guidance.",
+  "requestFramePermissions": []
+}

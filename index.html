@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StatMate: Jamovi Companion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                50: 'rgb(var(--primary-50) / <alpha-value>)',
+                100: 'rgb(var(--primary-100) / <alpha-value>)',
+                200: 'rgb(var(--primary-200) / <alpha-value>)',
+                300: 'rgb(var(--primary-300) / <alpha-value>)',
+                400: 'rgb(var(--primary-400) / <alpha-value>)',
+                500: 'rgb(var(--primary-500) / <alpha-value>)',
+                600: 'rgb(var(--primary-600) / <alpha-value>)',
+                700: 'rgb(var(--primary-700) / <alpha-value>)',
+                800: 'rgb(var(--primary-800) / <alpha-value>)',
+                900: 'rgb(var(--primary-900) / <alpha-value>)',
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+      body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+      
+      :root {
+        /* Default Indigo */
+        --primary-50: 238 242 255;
+        --primary-100: 224 231 255;
+        --primary-200: 199 210 254;
+        --primary-300: 165 180 252;
+        --primary-400: 129 140 248;
+        --primary-500: 99 102 241;
+        --primary-600: 79 70 229;
+        --primary-700: 67 56 202;
+        --primary-800: 55 48 163;
+        --primary-900: 49 46 129;
+      }
+
+      /* Professional Markdown Table Styles */
+      .markdown-table {
+        overflow-x: auto;
+        margin: 1rem 0;
+        border-radius: 8px;
+      }
+      .markdown-table table {
+        width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+        font-size: 0.9rem;
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
+      }
+      .markdown-table thead {
+        background-color: #f8fafc;
+        border-bottom: 2px solid #cbd5e1;
+      }
+      .markdown-table th {
+        text-align: left;
+        padding: 12px 16px;
+        font-weight: 600;
+        color: #334155;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+      }
+      .markdown-table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f1f5f9;
+        color: #475569;
+        vertical-align: top;
+      }
+      .markdown-table tr:last-child td {
+        border-bottom: none;
+      }
+      .markdown-table tr:nth-child(even) {
+        background-color: #fafbfd;
+      }
+      .markdown-table tr:hover {
+        background-color: #f1f5f9;
+      }
+      
+      /* Typography enhancements for Markdown */
+      .prose h1 { color: #1e293b; }
+      .prose h2 { color: #334155; }
+      .prose h3 { color: #475569; }
+      .prose strong { color: #0f172a; font-weight: 600; }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.6",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
+    "recharts": "https://aistudiocdn.com/recharts@^3.4.1",
+    "react-markdown": "https://aistudiocdn.com/react-markdown@^10.1.0",
+    "remark-gfm": "https://esm.sh/remark-gfm@4.0.0"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
