@@ -1,10 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { FileAttachment } from "../types";
 
-const API_KEY = process.env.API_KEY || '';
-
-const ai = new GoogleGenAI({ apiKey: API_KEY });
-
 const getSystemInstruction = (language: string) => `
 You are "JamoviStats & Dev Expert", a high-level expert in statistics for research, advanced Jamovi usage, and a web developer.
 
@@ -42,9 +38,8 @@ export const getConsultationResponse = async (
     history: {role: string, parts: {text: string}[]}[] = [],
     language: string = 'th'
 ) => {
-  if (!API_KEY) {
-    throw new Error("API Key is missing. Please ensure process.env.API_KEY is set.");
-  }
+  // Use process.env.API_KEY as per guidelines
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   try {
     const model = 'gemini-2.5-flash';
@@ -79,8 +74,12 @@ export const getConsultationResponse = async (
         });
     }
 
+    const messageContent = (messageParts.length === 1 && !attachments.length) 
+        ? userMessage 
+        : messageParts;
+
     const result = await chat.sendMessage({ 
-        message: messageParts.length === 1 && !attachments.length ? userMessage : messageParts 
+        message: messageContent 
     });
     
     return result.text;
@@ -95,7 +94,7 @@ export const performStatisticalAnalysis = async (
   dataContext: string,
   attachments: FileAttachment[] = []
 ) => {
-  if (!API_KEY) throw new Error("API Key is missing.");
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   try {
     const model = 'gemini-2.5-flash';
